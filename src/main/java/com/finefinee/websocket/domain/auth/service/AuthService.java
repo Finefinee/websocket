@@ -1,4 +1,4 @@
-package com.finefinee.websocket.global.jwt.service;
+package com.finefinee.websocket.domain.auth.service;
 
 import com.finefinee.websocket.domain.member.entity.MemberEntity;
 import com.finefinee.websocket.domain.member.repository.MemberRepository;
