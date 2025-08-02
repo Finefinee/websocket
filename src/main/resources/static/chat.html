@@ -1,17 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Spring WebSocket Chat</title>
+  <title>회원가입/로그인 + 채팅</title>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<input id="sender" placeholder="nickname">
-<input id="content" placeholder="message">
-<button onclick="sendMessage()">send</button>
+<h2>회원가입</h2>
+<input id="signup-username" placeholder="아이디">
+<input id="signup-password" type="password" placeholder="비밀번호">
+<button onclick="signup()">회원가입</button>
+<div id="signup-result"></div>
+<hr>
+<h2>로그인</h2>
+<input id="login-username" placeholder="아이디">
+<input id="login-password" type="password" placeholder="비밀번호">
+<button onclick="login()">로그인</button>
+<div id="login-result"></div>
+<hr>
+<h2>채팅</h2>
+<input id="chat-content" placeholder="메시지">
+<button onclick="sendMessage()">전송</button>
 <ul id="messages"></ul>
+
 <script>
-  var stompClient = null;
+  let stompClient = null;
+  let token = null;
+
+  function signup() {
+    const username = document.getElementById('signup-username').value;
+    const password = document.getElementById('signup-password').value;
+    fetch('/auth/signup', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password})
+    })
+            .then(res => res.text())
+            .then(msg => document.getElementById('signup-result').innerText = msg);
+  }
+
+  function login() {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    fetch('/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password})
+    })
+            .then(res => res.text())
+            .then(msg => {
+              document.getElementById('login-result').innerText = msg;
+              if (msg.includes('성공')) {
+                connect();
+              }
+            });
+  }
+
   function connect() {
     var socket = new SockJS('/ws-chat');
     stompClient = Stomp.over(socket);
@@ -24,12 +68,11 @@
       });
     });
   }
+
   function sendMessage() {
-    var sender = document.getElementById('sender').value;
-    var content = document.getElementById('content').value;
-    stompClient.send("/app/chat.send", {}, JSON.stringify({sender: sender, content: content}));
+    var content = document.getElementById('chat-content').value;
+    stompClient.send("/app/chat.send", {}, JSON.stringify({content: content}));
   }
-  connect();
 </script>
 </body>
 </html>
