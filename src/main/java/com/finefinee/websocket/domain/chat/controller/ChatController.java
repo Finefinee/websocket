@@ -1,5 +1,7 @@
 package com.finefinee.websocket.domain.chat.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.finefinee.websocket.domain.chat.model.ChatMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -8,10 +10,12 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-    // 클라이언트가 "/app/chat.send"로 메시지를 보내면 이 메서드가 실행됨
     @MessageMapping("/chat.send")
-    @SendTo("/topic/messages") // 모든 구독자에게 브로드캐스트
+    @SendTo("/topic/messages")
     public ChatMessage sendMessage(ChatMessage message) {
-        return message; // 받은 메시지를 그대로 모든 클라이언트에게 전달
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName(); // 로그인한 사용자명
+        message.setSender(username);      // sender에 자동으로 세팅
+        return message;
     }
 }
