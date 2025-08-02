@@ -1,6 +1,7 @@
 package com.finefinee.websocket.global.jwt.customsetting;
 
 import com.finefinee.websocket.domain.member.entity.MemberEntity;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,11 +11,14 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.Collections;
 
-@RequiredArgsConstructor
-@Component
+@Getter
 public class CustomUserDetails implements UserDetails {
 
     private final MemberEntity memberEntity;
+
+    public CustomUserDetails(MemberEntity memberEntity) {
+        this.memberEntity = memberEntity;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
